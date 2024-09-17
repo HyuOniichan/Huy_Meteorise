@@ -1,55 +1,38 @@
+#import
 
 import pygame 
-
 from pygame.locals import * 
-pygame.init() 
-
-from pygame import mixer 
-mixer.init() 
-
 import random 
 import math 
 import time 
 
+pygame.init() 
 
-#music 
-""" 
-#bg_music 
-mixer.music.load('')
-mixer.music.play(-1) 
-#other musics 
-mixer.Sound('').play() 
- """
+
+
+#screen
 
 screen_width = 1000 
 screen_height = 700 
 
 screen = pygame.display.set_mode((screen_width, screen_height))
-
 pygame.display.set_icon(pygame.image.load('./assets/play.png'))
-
 pygame.display.set_caption('Meteorise')
 
 background = pygame.image.load('./assets/universe.jpg')
-
 clock = pygame.time.Clock() 
-
 score = 0 
-
 lv = 1; 
+
 
 
 #player 
 
 playerSize = 50 
-
 playerImage = pygame.transform.scale(pygame.image.load('./assets/play.png'), (playerSize, playerSize))
-
 posx = (screen_width - playerSize) / 2
 posy = (screen_height - playerSize) / 2
-
 move = 6 + 0.0 
-
 direction = 'up'
 
 
@@ -57,11 +40,8 @@ direction = 'up'
 #meteor 
 
 ms = 2; 
-
 mx = 0; my = 0; md = 0; 
-
 meteorNumber = 5; 
-
 meteor = []
 
 
@@ -69,13 +49,10 @@ meteor = []
 #bullet 
 
 bulletImage = pygame.transform.rotate(pygame.transform.scale(pygame.image.load('./assets/bullet.png'), (playerSize / 2, playerSize / 2)), 90)
-
 bx = posx + playerSize / 4; 
 by = posy + playerSize / 4; 
 bs = 8; 
-
 fire = False; 
-
 directionBullet = 'up' 
 
 
@@ -85,41 +62,26 @@ directionBullet = 'up'
     #laser 
 
 laserAct = False; 
-
 laserUse = time.time(); 
-
 laserUsing = False; 
-
 directionLaser = 'up' 
-
 laserDistance = 1000 
-
 laserTime = 10 
 
     #shield 
 
 shieldAct = False; 
-
 shieldTime = 5 
 
 
 #planet 
 
 planetAppear = time.time() 
-
 px = 0; py = 0; pd = 0; 
-
 planetAct = False 
 
 
 
-
-""" 
-add skill 
-+ laser 
-+ dash (maybe)
-+ shield 
- """
 
 
 class Player(pygame.sprite.Sprite): 
@@ -262,8 +224,6 @@ def meteorRandom():
 
 
 
-
-
 class Skill(pygame.sprite.Sprite): 
     def __init__(self, type):
         super(Skill, self).__init__()
@@ -274,21 +234,16 @@ class Skill(pygame.sprite.Sprite):
         if type == 'shield': 
             self.surf = pygame.transform.scale(pygame.image.load('./assets/shield.png'), (playerSize * 3/2, playerSize * 3/2))
 
-
-
 laser = Skill('laser')
 aura = Skill('aura')
 shield = Skill('shield') 
 
 
 
-
-#editing 
 class Planet(pygame.sprite.Sprite): 
     def __init__(self):
         super(Planet, self).__init__()
         self.surf = pygame.transform.scale(pygame.image.load("./assets/planet.png"), (playerSize, playerSize)) 
-
         self.rd() 
 
     def rd(self): 
@@ -309,7 +264,6 @@ class Planet(pygame.sprite.Sprite):
             self.px = -playerSize
             self.py = random.randint(0, screen_height)
             self.pd = 3 
-
 
     def flying(self): 
         global laserTime, shieldTime, planetAct
@@ -346,30 +300,37 @@ class Planet(pygame.sprite.Sprite):
                 shieldTime += random.randint(1, 3) 
             
             self.rd() 
-                
             planetAct = False 
 
-
-
 planet = Planet() 
-
-
-#editing 
-
 
 
 
 font = pygame.font.SysFont('Arial', 20) 
 
 def infoText(): 
+    padding = 10 
+
     scoreImg = font.render(f'Score: {score}', True, 'white') 
-    screen.blit(scoreImg, (10, 10)) 
+    screen.blit(scoreImg, (padding, 10)) 
+    padding += scoreImg.get_width() + 20
+
     lvImg = font.render(f'Level: {lv}', True, 'white')
-    screen.blit(lvImg, (30 + scoreImg.get_width(), 10))
-    laserImg = font.render(f'Laser: {laserTime}', True, 'white')
-    screen.blit(laserImg, (50 + scoreImg.get_width() + lvImg.get_width(), 10))
-    shieldImg = font.render(f'Shield: {shieldTime}', True, 'white') 
-    screen.blit(shieldImg, (70 + scoreImg.get_width() + lvImg.get_width() + laserImg.get_width(), 10))
+    screen.blit(lvImg, (padding, 10))
+    padding += lvImg.get_width() + 20 
+
+    laserImg = font.render(f'Laser (L): {laserTime}', True, 'white')
+    screen.blit(laserImg, (padding, 10))
+    padding += laserImg.get_width() + 20
+    
+    shieldImg = font.render(f'Shield (J): {shieldTime}', True, 'white') 
+    screen.blit(shieldImg, (padding, 10))
+    padding += shieldImg.get_width() + 20 
+
+    bulletImg = font.render('Bullet (K): 1', True, 'white') 
+    screen.blit(bulletImg, (padding, 10))
+
+
     
 #stop all the activities 
 def gameOver(): 
@@ -378,14 +339,10 @@ def gameOver():
 
 
 
-
-
-
 def collision(x1, y1, x2, y2, ok): 
     distance = math.sqrt(math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2)) 
     if (distance < ok): return True; 
     else: return False; 
-
 
 
 
@@ -473,12 +430,12 @@ def render():
                     if (i.type == 1): score += 10; 
                     elif (i.type == 2): score += 20; 
                     elif (i.type == 3): score += 20; 
-                    print(score) #test
                     check = True; 
 
         #end game 
         if collision(i.m_x, i.m_y, posx, posy, playerSize): 
-            print(score, lv, laserTime, shieldTime) 
+            print("Score: ", score)  
+            print("Level: ", lv)  
             exit() 
 
         if laserAct: 
@@ -487,28 +444,24 @@ def render():
                     if (i.type == 1): score += 10; 
                     elif (i.type == 2): score += 20; 
                     elif (i.type == 3): score += 20; 
-                    print(score) 
                     check = True; 
             elif directionLaser == 'down': 
                 if i.m_x > posx - playerSize * 3/2 and i.m_x < posx + playerSize * 2 and i.m_y > posy + playerSize and i.m_y < screen_height + playerSize: 
                     if (i.type == 1): score += 10; 
                     elif (i.type == 2): score += 20; 
                     elif (i.type == 3): score += 20; 
-                    print(score) 
                     check = True; 
             elif directionLaser == 'right': 
                 if i.m_x > posx + playerSize and i.m_x < screen_width + playerSize and i.m_y > posy - playerSize * 3/2 and i.m_y < posy + playerSize * 2: 
                     if (i.type == 1): score += 10; 
                     elif (i.type == 2): score += 20; 
                     elif (i.type == 3): score += 20; 
-                    print(score) 
                     check = True; 
             elif directionLaser == 'left': 
                 if i.m_x > -playerSize and i.m_x < posx and i.m_y > posy - playerSize * 3/2 and i.m_y < posy + playerSize * 2: 
                     if (i.type == 1): score += 10; 
                     elif (i.type == 2): score += 20; 
                     elif (i.type == 3): score += 20; 
-                    print(score) 
                     check = True; 
 
         if shieldAct: 
@@ -517,12 +470,10 @@ def render():
                 if (i.type == 1): score += 10; 
                 elif (i.type == 2): score += 20; 
                 elif (i.type == 3): score += 20; 
-                print(score) 
                 check = True; 
 
         if check: meteor.remove(i); 
                 
-
 
 
     #skill - laser 
@@ -561,13 +512,9 @@ def render():
 
 
 
-
-
-
-
+# play 
 
 playing = False 
-
 running = True 
 
 while running: 
@@ -575,11 +522,11 @@ while running:
 
     for event in pygame.event.get(): 
         if event.type == KEYDOWN: 
-            if event.key == K_ESCAPE: 
+            if event.key == K_SPACE: 
+                if playing: playing = False 
+                else: playing = True
+            elif event.key == K_ESCAPE: 
                 running = False 
-            elif event.key == K_p: 
-                if playing: playing = False; 
-                else: playing = True; 
             elif event.key == K_k: 
                 if fire == False: 
                     fire = True 
@@ -589,7 +536,7 @@ while running:
                     laserTime -= 1; 
                     laserAct = True; 
                     laserUsing = True; 
-            elif event.key == K_i: 
+            elif event.key == K_j: 
                 if shieldTime > 0 and shieldAct == False: 
                     shieldTime -= 1; 
                     shieldAct = True; 
@@ -597,10 +544,11 @@ while running:
             running = False 
         
     if playing: render() 
+    else: 
+        startImg = font.render('Press spacebar to start/pause', True, 'white') 
+        screen.blit(startImg, (screen_width // 2 - 110, screen_height // 2)) 
 
     pygame.display.update() 
-
-
 
 
 
